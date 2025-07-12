@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>浪漫表白全流程效果</title>
+    <style>
+        html, body {
+            margin: 0; padding: 0;
+            width: 100vw; height: 100vh;
+            overflow: hidden;
+            background: #121212;
+            font-family: '微软雅黑', sans-serif;
+            color: white;
+            position: relative;
+        }
+        #blur-bg {
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: rgba(40, 40, 40, 0.4);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 0;
+            transition: opacity 1s ease;
+        }
+        #slideshow {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            transition: opacity 1s ease;
+        }
+        .slide {
+            position: absolute;
+            width: 40vw;
+            height: 40vh;
+            background-size: cover;
+            background-position: center center;
+            border-radius: 1vw;
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+            opacity: 0.85;
+            transition: transform 1.2s ease, opacity 1.2s ease;
+            transform-origin: center center;
+            user-select: none;
+        }
+        #heart-canvas, #fireworks-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 1s ease;
+            background: transparent !important;
+        }
+        #message {
+            display: none;
+            position: fixed;
+            z-index: 20;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90vw;
+            color: white;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            user-select: none;
+        }
+        #text {
+            font-size: 5vw;
+            margin-top: 2vw;
+            max-width: 80vw;
+            text-shadow: 0 0 8px rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.4);
+            padding: 3vw;
+            border-radius: 1.5vw;
+            line-height: 1.4;
+        }
+        #heart-container {
+            margin: 0 auto;
+            width: 20vw;
+            height: 18vw;
+            filter: drop-shadow(0 0 8px crimson);
+            animation: heartBeat 1.4s ease-in-out infinite;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.25); }
+        }
+    </style>
+</head>
+<body>
+<div id="blur-bg"></div>
+<div id="slideshow">
+    <!-- 替换为你的图片路径 -->
+    <div class="slide" style="background-image: url('p/2.jpg');"></div>
+    <div class="slide" style="background-image: url('p/3.JPG');"></div>
+    <div class="slide" style="background-image: url('p/4.JPG');"></div>
+    <div class="slide" style="background-image: url('p/5.JPG');"></div>
+    <div class="slide" style="background-image: url('p/6.JPG');"></div>
+    <div class="slide" style="background-image: url('p/7.JPG');"></div>
+    <div class="slide" style="background-image: url('p/8.JPG');"></div>
+    <div class="slide" style="background-image: url('p/9.jpg');"></div>
+    <div class="slide" style="background-image: url('p/10.jpg');"></div>
+    <div class="slide" style="background-image: url('p/11.jpg');"></div>
+    <div class="slide" style="background-image: url('p/12.JPG');"></div>
+    <div class="slide" style="background-image: url('p/13.jpg');"></div>
+    <div class="slide" style="background-image: url('p/14.jpg');"></div>
+    <div class="slide" style="background-image: url('p/15.jpg');"></div>
+    <div class="slide" style="background-image: url('p/16.jpg');"></div>
+    <div class="slide" style="background-image: url('p/17.jpg');"></div>
+    <div class="slide" style="background-image: url('p/18.jpg');"></div>
+    <div class="slide" style="background-image: url('p/19.jpg');"></div>
+</div>
+
+<canvas id="heart-canvas"></canvas>
+<canvas id="fireworks-canvas"></canvas>
+
+<div id="message">
+    <div id="heart-container" style="opacity:0;">
+        <svg viewBox="0 0 512 512" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" >
+            <defs>
+                <radialGradient id="grad" cx="50%" cy="50%" r="70%">
+                    <stop offset="0%" stop-color="#FF5F6D"/>
+                    <stop offset="50%" stop-color="#FFC371"/>
+                    <stop offset="100%" stop-color="#FF5F6D" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%" >
+                    <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#FF5F6D" flood-opacity="0.7"/>
+                </filter>
+            </defs>
+            <path filter="url(#glow)" fill="url(#grad)" stroke="#FF2A68" stroke-width="10"
+                  d="M471.7 73.7c-54-30-121-7-148 40-27-47-94-70-148-40-67 37-70 120-30 176 37 52 131 136 178 176 47-40 141-124 178-176 40-56 37-139-30-176z"/>
+        </svg>
+    </div>
+    <div id="text" style="opacity:0;">
+        <h1>喜欢你</h1>
+        <p>我是小学生李贵银，我喜欢小学生宋一鸣</p>
+    </div>
+</div>
+
+<script>
+    const slides = document.querySelectorAll(".slide");
+    const blurBg = document.getElementById("blur-bg");
+    const slideshow = document.getElementById("slideshow");
+    const heartCanvas = document.getElementById("heart-canvas");
+    const fireworksCanvas = document.getElementById("fireworks-canvas");
+    const heartCtx = heartCanvas.getContext("2d");
+    const fireworksCtx = fireworksCanvas.getContext("2d");
+    const message = document.getElementById("message");
+    const heartContainer = document.getElementById("heart-container");
+    const textBlock = document.getElementById("text");
+
+    let cw, ch;
+    function resize() {
+        cw = window.innerWidth;
+        ch = window.innerHeight;
+        heartCanvas.width = cw;
+        heartCanvas.height = ch;
+        fireworksCanvas.width = cw;
+        fireworksCanvas.height = ch;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    // 照片随机散落
+    function randomRange(min, max) { return Math.random() * (max - min) + min; }
+    function scatterAllSlides() {
+        slides.forEach((slide) => {
+            const scale = randomRange(0.5, 1);
+            const rotate = randomRange(-45, 45);
+            const x = randomRange(5, 95);
+            const y = randomRange(10, 85);
+            slide.style.transition = 'transform 1.2s ease, opacity 1.2s ease';
+            slide.style.transform = `translate(-50%, -50%) translate(${x}vw, ${y}vh) scale(${scale}) rotate(${rotate}deg)`;
+            slide.style.opacity = randomRange(0.7, 1);
+            slide.style.zIndex = Math.floor(randomRange(1, 20));
+        });
+    }
+    scatterAllSlides();
+    let scatterInterval = setInterval(scatterAllSlides, 1000);
+
+    // 高级爱心粒子
+    class HeartParticle {
+        constructor() {
+            this.x = Math.random() * cw;
+            this.y = ch + 20;
+            this.size = Math.random() * 15 + 15;
+            this.baseSize = this.size;
+            this.speedY = -(Math.random() * 1.2 + 0.8);
+            this.speedX = (Math.random() - 0.5) * 0.6;
+            this.opacity = 1;
+            this.fadeRate = Math.random() * 0.007 + 0.003;
+            this.angle = Math.random() * Math.PI * 2;
+            this.spinSpeed = (Math.random() - 0.5) * 0.05;
+            this.colorHue = 340 + Math.random() * 20;
+            this.glowRadius = this.size * 0.8;
+            this.sizeChangeSpeed = (Math.random() * 0.02 + 0.01);
+            this.sizeDirection = 1;
+        }
+        draw(ctx) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            let gradient = ctx.createRadialGradient(0, 0, this.size * 0.3, 0, 0, this.size);
+            gradient.addColorStop(0, `rgba(255, 95, 109, ${this.opacity})`);
+            gradient.addColorStop(0.6, `rgba(255, 195, 113, ${this.opacity * 0.5})`);
+            gradient.addColorStop(1, `rgba(255, 95, 109, 0)`);
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, this.glowRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = `rgba(255, 95, 109, ${this.opacity})`;
+            ctx.shadowColor = `rgba(255, 95, 109, ${this.opacity * 0.7})`;
+            ctx.shadowBlur = 10;
+            const s = this.size / 20;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(0, -3*s, -5*s, -15*s, -10*s, -15*s);
+            ctx.bezierCurveTo(-20*s, -15*s, -20*s, 0, -20*s, 0);
+            ctx.bezierCurveTo(-20*s, 10*s, -10*s, 15*s, 0, 25*s);
+            ctx.bezierCurveTo(10*s, 15*s, 20*s, 10*s, 20*s, 0);
+            ctx.bezierCurveTo(20*s, 0, 20*s, -15*s, 10*s, -15*s);
+            ctx.bezierCurveTo(5*s, -15*s, 0, -3*s, 0, 0);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.angle += this.spinSpeed;
+            this.opacity -= this.fadeRate;
+            if (this.opacity < 0) this.opacity = 0;
+            if(this.size >= this.baseSize * 1.3) this.sizeDirection = -1;
+            if(this.size <= this.baseSize * 0.7) this.sizeDirection = 1;
+            this.size += this.sizeChangeSpeed * this.sizeDirection;
+            this.glowRadius = this.size * 0.8;
+        }
+    }
+
+    // 烟花代码
+    class Firework {
+        constructor(sx, sy, tx, ty) {
+            this.x = sx;
+            this.y = sy;
+            this.sx = sx;
+            this.sy = sy;
+            this.tx = tx;
+            this.ty = ty;
+            this.distanceToTarget = dist(sx, sy, tx, ty);
+            this.distanceTraveled = 0;
+            this.coordinates = [];
+            this.coordinateCount = 3;
+            while(this.coordinateCount--) {
+                this.coordinates.push([this.x, this.y]);
+            }
+            this.angle = Math.atan2(ty - sy, tx - sx);
+            this.speed = 4;
+            this.acceleration = 1.05;
+            this.brightness = randomRange(50, 70);
+            this.targetRadius = 1;
+        }
+        update(index) {
+            this.coordinates.pop();
+            this.coordinates.unshift([this.x, this.y]);
+            if(this.targetRadius < 8) {
+                this.targetRadius += 0.3;
+            } else {
+                this.targetRadius = 1;
+            }
+            this.speed *= this.acceleration;
+            let vx = Math.cos(this.angle) * this.speed;
+            let vy = Math.sin(this.angle) * this.speed;
+            this.distanceTraveled = dist(this.sx, this.sy, this.x + vx, this.y + vy);
+            if(this.distanceTraveled >= this.distanceToTarget) {
+                createParticles(this.tx, this.ty);
+                fireworks.splice(index, 1);
+            } else {
+                this.x += vx;
+                this.y += vy;
+            }
+        }
+        draw(ctx) {
+            ctx.beginPath();
+            ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
+            ctx.lineTo(this.x, this.y);
+            ctx.strokeStyle = `hsl(${this.brightness}, 100%, 70%)`;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(this.tx, this.ty, this.targetRadius, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+    }
+    class Particle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.coordinates = [];
+            this.coordinateCount = 5;
+            while(this.coordinateCount--) {
+                this.coordinates.push([this.x, this.y]);
+            }
+            this.angle = randomRange(0, Math.PI * 2);
+            this.speed = randomRange(2, 10);
+            this.friction = 0.95;
+            this.gravity = 0.4;
+            this.hue = randomRange(0, 360);
+            this.brightness = randomRange(50, 80);
+            this.alpha = 1;
+            this.decay = randomRange(0.015, 0.03);
+        }
+        update(index) {
+            this.coordinates.pop();
+            this.coordinates.unshift([this.x, this.y]);
+            this.speed *= this.friction;
+            this.x += Math.cos(this.angle) * this.speed;
+            this.y += Math.sin(this.angle) * this.speed + this.gravity;
+            this.alpha -= this.decay;
+            if(this.alpha <= 0) {
+                particles.splice(index, 1);
+            }
+        }
+        draw(ctx) {
+            ctx.beginPath();
+            ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
+            ctx.lineTo(this.x, this.y);
+            ctx.strokeStyle = `hsla(${this.hue}, 100%, ${this.brightness}%, ${this.alpha})`;
+            ctx.stroke();
+        }
+    }
+    function dist(aX, aY, bX, bY) {
+        const x = bX - aX;
+        const y = bY - aY;
+        return Math.sqrt(x * x + y * y);
+    }
+    function createParticles(x, y) {
+        let particleCount = 30;
+        while(particleCount--) {
+            particles.push(new Particle(x, y));
+        }
+    }
+
+    let hearts = [];
+    let fireworks = [];
+    let particles = [];
+    let fireworkTimerTick = 0, fireworkLimiterTick = 0;
+    const fireworkLimiterTotal = 5, fireworkTimerTotal = 80;
+
+    function animate() {
+        heartCtx.clearRect(0, 0, cw, ch);
+        fireworksCtx.clearRect(0, 0, cw, ch);
+
+        hearts.forEach((heart, i) => {
+            heart.update();
+            if(heart.opacity <= 0) hearts.splice(i, 1);
+            else heart.draw(heartCtx);
+        });
+
+        fireworks.forEach((firework, i) => {
+            firework.update(i);
+            firework.draw(fireworksCtx);
+        });
+
+        particles.forEach((particle, i) => {
+            particle.update(i);
+            particle.draw(fireworksCtx);
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    function spawnHearts() {
+        if (hearts.length < 60) {
+            hearts.push(new HeartParticle());
+        }
+    }
+
+    async function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function runSequence() {
+        blurBg.style.opacity = '1';
+        slideshow.style.opacity = '1';
+        heartCanvas.style.opacity = '0';
+        fireworksCanvas.style.opacity = '0';
+        message.style.opacity = '0';
+        message.style.display = 'none';
+        heartContainer.style.opacity = '0';
+        textBlock.style.opacity = '0';
+
+        scatterAllSlides();
+        scatterInterval = setInterval(scatterAllSlides, 1000);
+        await delay(5000);
+        clearInterval(scatterInterval);
+
+        // 过渡隐藏照片，显示canvas准备爱心烟花动画
+        slideshow.style.opacity = '0';
+        await delay(1000);
+
+        heartCanvas.style.opacity = '1';
+        fireworksCanvas.style.opacity = '1';
+
+        const startTime = Date.now();
+
+        function heartFireworkLoop() {
+            const elapsed = Date.now() - startTime;
+            spawnHearts();
+
+            fireworkTimerTick++;
+            if(fireworkTimerTick >= fireworkTimerTotal) {
+                if(fireworkLimiterTick < fireworkLimiterTotal) {
+                    const sx = cw/2 + (Math.random() - 0.5) * cw/3;
+                    const sy = ch;
+                    const tx = Math.random() * cw;
+                    const ty = Math.random() * ch / 2;
+                    fireworks.push(new Firework(sx, sy, tx, ty));
+                    fireworkLimiterTick++;
+                }
+                fireworkTimerTick = 0;
+            }
+
+            if(elapsed < 5000) {
+                requestAnimationFrame(heartFireworkLoop);
+            } else {
+                heartCanvas.style.opacity = '0';
+                fireworksCanvas.style.opacity = '0';
+
+                message.style.display = 'block';
+                setTimeout(() => {
+                    message.style.opacity = '1';
+                    heartContainer.style.opacity = '1';
+                    textBlock.style.opacity = '1';
+                }, 100);
+
+                let heartFallInterval = setInterval(() => {
+                    if(hearts.length < 100) {
+                        hearts.push(new HeartParticle());
+                    }
+                }, 100);
+
+                animate();
+
+                setTimeout(() => {
+                    clearInterval(heartFallInterval);
+                }, 120000);
+            }
+        }
+        heartFireworkLoop();
+    }
+
+    runSequence();
+</script>
+</body>
+</html>
